@@ -1,1 +1,275 @@
-<p>profile works!</p>
+<div class="profile-page">
+  <div class="profile-heading">
+    <div>
+      <span class="eyebrow">STUDENT PORTAL</span>
+      <h1>My Profile</h1>
+      <p>View and manage your academic details and personal information.</p>
+    </div>
+
+    @if (profile(); as student) {
+      <span class="live-status"><span></span> {{ statusLabel(student.status) }}</span>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="loader"></div>
+      <p>Loading profile...</p>
+    </div>
+  } @else {
+    @if (errorMessage()) {
+      <div class="alert error-alert mb-4">
+        <span>⚠</span>
+        {{ errorMessage() }}
+        @if (!profile()) {
+          <button class="retry-btn" (click)="loadProfile()">Try Again</button>
+        }
+      </div>
+    }
+
+    @if (successMessage()) {
+      <div class="alert success-alert mb-4">
+        <span>✓</span>
+        {{ successMessage() }}
+      </div>
+    }
+
+    @if (profile(); as student) {
+      <div class="summary-grid">
+        <article class="summary-card purple">
+          <div class="summary-icon">#</div>
+          <div>
+            <span>Student ID</span>
+            <h2>STU-{{ student.studentId }}</h2>
+            <small>Unique portal identifier</small>
+          </div>
+        </article>
+
+        <article class="summary-card green">
+          <div class="summary-icon">★</div>
+          <div>
+            <span>Current CGPA</span>
+            <h2>{{ student.cgpa | number: '1.2-2' }}</h2>
+            <small>Out of 10.00 scale</small>
+          </div>
+        </article>
+
+        <article class="summary-card orange">
+          <div class="summary-icon">▤</div>
+          <div>
+            <span>Department</span>
+            <h2 class="text-truncate-val">{{ student.department }}</h2>
+            <small>Registered academic stream</small>
+          </div>
+        </article>
+
+        <article class="summary-card blue">
+          <div class="summary-icon">♙</div>
+          <div>
+            <span>Age</span>
+            <h2>{{ student.age }} yrs</h2>
+            <small>Verified student age</small>
+          </div>
+        </article>
+      </div>
+
+      <div class="profile-grid">
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>Personal & Academic Details</h2>
+              <p>Keep your name, department, age, and CGPA up to date</p>
+            </div>
+
+            @if (!isEditing()) {
+              <button type="button" class="edit-btn" (click)="enableEdit()">
+                ✎ Edit Profile
+              </button>
+            }
+          </div>
+
+          <div class="panel-body">
+            @if (!isEditing()) {
+              <div class="details-grid">
+                <div class="detail-item">
+                  <label>Full Name</label>
+                  <strong>{{ student.name }}</strong>
+                </div>
+
+                <div class="detail-item">
+                  <label>Email Address</label>
+                  <strong>{{ student.email }}</strong>
+                  <small class="readonly-hint">Email cannot be changed</small>
+                </div>
+
+                <div class="detail-item">
+                  <label>Department</label>
+                  <strong>{{ student.department }}</strong>
+                </div>
+
+                <div class="detail-item">
+                  <label>Age</label>
+                  <strong>{{ student.age }} years</strong>
+                </div>
+
+                <div class="detail-item">
+                  <label>Cumulative GPA (CGPA)</label>
+                  <strong>{{ student.cgpa | number: '1.2-2' }} / 10.00</strong>
+                </div>
+
+                <div class="detail-item">
+                  <label>Account Status</label>
+                  <div>
+                    <span class="status-badge active">
+                      {{ statusLabel(student.status) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            } @else {
+              <form (ngSubmit)="saveProfile()" #profileForm="ngForm" class="edit-form">
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label class="form-label">Full Name *</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      name="name"
+                      [(ngModel)]="editForm.name"
+                      #nameInput="ngModel"
+                      required
+                      maxlength="120"
+                      placeholder="Enter your full name"
+                    />
+                    @if (nameInput.invalid && nameInput.touched) {
+                      <small class="field-error">Full name is required (max 120 chars).</small>
+                    }
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Email Address (Read-only)</label>
+                    <input
+                      type="email"
+                      class="form-control readonly-input"
+                      [value]="student.email"
+                      disabled
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Department *</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      name="department"
+                      [(ngModel)]="editForm.department"
+                      #deptInput="ngModel"
+                      required
+                      maxlength="100"
+                      placeholder="e.g. Computer Science"
+                    />
+                    @if (deptInput.invalid && deptInput.touched) {
+                      <small class="field-error">Department is required.</small>
+                    }
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Age (17 – 60) *</label>
+                    <input
+                      type="number"
+                      class="form-control"
+                      name="age"
+                      [(ngModel)]="editForm.age"
+                      #ageInput="ngModel"
+                      required
+                      min="17"
+                      max="60"
+                    />
+                    @if (ageInput.invalid && ageInput.touched) {
+                      <small class="field-error">Age must be between 17 and 60.</small>
+                    }
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">CGPA (0.00 – 10.00) *</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      class="form-control"
+                      name="cgpa"
+                      [(ngModel)]="editForm.cgpa"
+                      #cgpaInput="ngModel"
+                      required
+                      min="0"
+                      max="10"
+                    />
+                    @if (cgpaInput.invalid && cgpaInput.touched) {
+                      <small class="field-error">CGPA must be between 0 and 10.</small>
+                    }
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button
+                    type="button"
+                    class="cancel-btn"
+                    [disabled]="isSaving()"
+                    (click)="cancelEdit()"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    class="save-btn"
+                    [disabled]="profileForm.invalid || isSaving()"
+                  >
+                    @if (isSaving()) {
+                      Saving Changes...
+                    } @else {
+                      Save Changes
+                    }
+                  </button>
+                </div>
+              </form>
+            }
+          </div>
+        </section>
+
+        <section class="panel identity-panel">
+          <div class="panel-header">
+            <div>
+              <h2>Student Identity</h2>
+              <p>Registration & verification timeline</p>
+            </div>
+          </div>
+
+          <div class="identity-body">
+            <div class="avatar-circle">{{ initials() }}</div>
+            <h3>{{ student.name }}</h3>
+            <span class="identity-email">{{ student.email }}</span>
+            <span class="dept-pill">{{ student.department }}</span>
+
+            <div class="timeline-list">
+              <div class="timeline-row">
+                <span>Registered On</span>
+                <strong>{{ student.registeredAt | date: 'dd MMM yyyy' }}</strong>
+              </div>
+
+              <div class="timeline-row">
+                <span>Reviewed On</span>
+                <strong>
+                  {{ student.reviewedAt ? (student.reviewedAt | date: 'dd MMM yyyy') : '—' }}
+                </strong>
+              </div>
+
+              <div class="timeline-row">
+                <span>Portal Role</span>
+                <strong>Student</strong>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    }
+  }
+</div>

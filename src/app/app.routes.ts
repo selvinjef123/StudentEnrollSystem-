@@ -75,6 +75,11 @@ export const routes: Routes = [
         redirectTo: 'courses',
         pathMatch: 'full',
       },
+      {
+  path: 'profile',
+  loadComponent: () =>
+    import('./features/student/profile/profile').then((m) => m.Profile),
+},
     ],
   },
   {
@@ -86,4 +91,5 @@ export const routes: Routes = [
     path: '**',
     redirectTo: 'login',
   },
+
 ];
