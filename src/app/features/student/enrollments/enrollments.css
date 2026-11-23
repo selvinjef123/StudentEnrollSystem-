@@ -1,0 +1,185 @@
+.enrollments-page {
+  padding: 28px;
+  color: #29243b;
+}
+
+.page-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.eyebrow {
+  color: #8b5cf6;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.page-heading h1 {
+  font-size: 28px;
+  font-weight: 800;
+  margin: 6px 0;
+  color: #29213f;
+}
+
+.page-heading p {
+  color: #898397;
+  font-size: 14px;
+  margin: 0;
+}
+
+.summary-pills {
+  display: flex;
+  gap: 10px;
+}
+
+.pill {
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.pill.purple {
+  background: #f0eaff;
+  color: #8050d8;
+}
+
+.pill.green {
+  background: #e9f8ef;
+  color: #16834a;
+}
+
+.table-panel {
+  background: #fff;
+  border: 1px solid #efedf4;
+  border-radius: 16px;
+  overflow-x: auto;
+  box-shadow: 0 4px 15px rgba(35, 25, 60, 0.035);
+}
+
+.enrollments-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.enrollments-table th {
+  background: #faf9fd;
+  padding: 14px 18px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #898397;
+  border-bottom: 1px solid #efedf4;
+}
+
+.enrollments-table td {
+  padding: 16px 18px;
+  font-size: 14px;
+  border-bottom: 1px solid #f4f2f8;
+  color: #302942;
+}
+
+.course-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.code-tag {
+  font-size: 11px;
+  font-weight: 800;
+  color: #8050d8;
+}
+
+.status-badge {
+  background: #e9f8ef;
+  color: #16834a;
+  padding: 5px 11px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.drop-btn {
+  border: 1px solid #ffd4cd;
+  background: #fff0ed;
+  color: #c24141;
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.drop-btn:hover {
+  background: #ffe3de;
+}
+
+.drop-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.alert {
+  padding: 12px 16px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.error-alert {
+  background: #fff0ed;
+  color: #c24141;
+  border: 1px solid #ffd4cd;
+}
+
+.success-alert {
+  background: #e9f8ef;
+  color: #16834a;
+  border: 1px solid #bfead0;
+}
+
+.loading-state,
+.empty-state {
+  text-align: center;
+  padding: 48px 20px;
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #efedf4;
+  color: #898397;
+}
+
+.browse-btn {
+  display: inline-block;
+  margin-top: 14px;
+  background: linear-gradient(135deg, #7545ed, #a33df0);
+  color: #fff;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.loader {
+  width: 30px;
+  height: 30px;
+  margin: 0 auto 12px;
+  border: 3px solid #eee8fa;
+  border-top-color: #8b5cf6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

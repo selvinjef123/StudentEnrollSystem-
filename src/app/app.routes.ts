@@ -34,13 +34,17 @@ export const routes: Routes = [
             (m) => m.CourseListComponent,
           ),
       },
-
       {
         path: 'enrollments',
         loadComponent: () =>
           import('./features/enrollments/admin/enrollment-list/enrollment-list').then(
             (m) => m.EnrollmentListComponent,
           ),
+      },
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
       },
     ],
   },
@@ -59,27 +63,23 @@ export const routes: Routes = [
       {
         path: 'courses',
         loadComponent: () =>
-          import('./features/enrollments/student/available-courses/available-courses').then(
-            (m) => m.AvailableCourses,
-          ),
+          import('./features/student/courses/courses').then((m) => m.StudentCourses),
       },
       {
         path: 'enrollments',
         loadComponent: () =>
-          import('./features/enrollments/student/my-enrollments/my-enrollments').then(
-            (m) => m.MyEnrollments,
-          ),
+          import('./features/student/enrollments/enrollments').then((m) => m.StudentEnrollments),
+      },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./features/student/profile/profile').then((m) => m.Profile),
       },
       {
         path: '',
-        redirectTo: 'courses',
+        redirectTo: 'dashboard',
         pathMatch: 'full',
       },
-      {
-  path: 'profile',
-  loadComponent: () =>
-    import('./features/student/profile/profile').then((m) => m.Profile),
-},
     ],
   },
   {
@@ -91,5 +91,4 @@ export const routes: Routes = [
     path: '**',
     redirectTo: 'login',
   },
-
 ];

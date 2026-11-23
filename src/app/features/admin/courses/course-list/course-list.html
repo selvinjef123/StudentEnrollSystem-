@@ -7,8 +7,16 @@
       <p>Manage courses, fees, capacity and availability.</p>
     </div>
 
-    <button class="btn-add"><span>+</span> Add New Course</button>
+    <button type="button" class="btn-add" (click)="openAddModal()">
+      <span>+</span> Add New Course
+    </button>
   </div>
+
+  @if (successMessage()) {
+    <div style="background:#e9f8ef;color:#16834a;border:1px solid #bfead0;padding:12px 16px;border-radius:12px;margin-bottom:16px;font-weight:600;">
+      ✓ {{ successMessage() }}
+    </div>
+  }
 
   <!-- Summary Cards -->
   <div class="summary-grid">
@@ -56,34 +64,24 @@
       <span class="record-count"> {{ totalRecords() }} courses </span>
     </div>
 
-    <!-- Loading -->
     @if (isLoading()) {
       <div class="state-message">
         <div class="loader"></div>
         <p>Loading courses...</p>
       </div>
-    }
-
-    <!-- Error -->
-    @else if (errorMessage()) {
+    } @else if (errorMessage()) {
       <div class="state-message error-state">
         <span>⚠️</span>
         <p>{{ errorMessage() }}</p>
         <button class="btn-retry" (click)="loadCourses()">Try Again</button>
       </div>
-    }
-
-    <!-- Empty -->
-    @else if (courses().length === 0) {
+    } @else if (courses().length === 0) {
       <div class="state-message empty-state">
         <span>📚</span>
         <h3>No courses found</h3>
         <p>There are currently no courses to display.</p>
       </div>
-    }
-
-    <!-- Course Data -->
-    @else {
+    } @else {
       <div class="table-responsive">
         <table class="course-table">
           <thead>
@@ -94,6 +92,7 @@
               <th>ENROLLMENT</th>
               <th>AVAILABLE SEATS</th>
               <th>STATUS</th>
+              <th>ACTIONS</th>
             </tr>
           </thead>
 
@@ -113,18 +112,16 @@
                 </td>
 
                 <td>
-                  <span class="duration">
-                    {{ course.duration }}
-                  </span>
+                  <span class="duration">{{ course.duration }}</span>
                 </td>
 
                 <td>
-                  <strong class="fees"> ₹{{ course.fees | number: '1.0-2' }} </strong>
+                  <strong class="fees">₹{{ course.fees | number: '1.0-2' }}</strong>
                 </td>
 
                 <td>
                   <div class="enrollment-info">
-                    <strong> {{ course.enrolledCount }} / {{ course.capacity }} </strong>
+                    <strong>{{ course.enrolledCount }} / {{ course.capacity }}</strong>
                     <div class="progress-track">
                       <div
                         class="progress-fill"
@@ -156,6 +153,27 @@
                     {{ course.isActive ? 'Active' : 'Inactive' }}
                   </span>
                 </td>
+
+                <td>
+                  <div style="display:flex;gap:8px;">
+                    <button
+                      type="button"
+                      (click)="openEditModal(course)"
+                      style="border:none;background:#f0eaff;color:#8050d8;padding:6px 12px;border-radius:8px;font-weight:700;cursor:pointer;"
+                    >
+                      Edit
+                    </button>
+                    @if (course.isActive) {
+                      <button
+                        type="button"
+                        (click)="deactivateCourse(course)"
+                        style="border:none;background:#fff0ed;color:#c24141;padding:6px 12px;border-radius:8px;font-weight:700;cursor:pointer;"
+                      >
+                        Deactivate
+                      </button>
+                    }
+                  </div>
+                </td>
               </tr>
             }
           </tbody>
@@ -163,7 +181,6 @@
       </div>
     }
 
-    <!-- Pagination -->
     @if (!isLoading() && !errorMessage() && totalRecords() > 0) {
       <div class="pagination">
         <span class="pagination-info">
@@ -175,9 +192,7 @@
           <button class="page-btn" (click)="previousPage()" [disabled]="pageNumber() === 1">
             ← Previous
           </button>
-
           <span class="current-page">{{ pageNumber() }}</span>
-
           <button class="page-btn" (click)="nextPage()" [disabled]="pageNumber() >= totalPages()">
             Next →
           </button>
@@ -185,4 +200,118 @@
       </div>
     }
   </div>
+
+  <!-- Add / Edit Course Modal -->
+  @if (isModalOpen()) {
+    <div
+      class="course-modal-backdrop"
+      role="presentation"
+      (click)="$event.target === $event.currentTarget && closeModal()"
+    >
+      <div class="course-modal" role="dialog" aria-modal="true">
+        <div class="course-modal-header">
+          <h2>
+            {{ editingCourseId() ? 'Edit Course' : 'Add New Course' }}
+          </h2>
+          <button
+            type="button"
+            class="course-modal-close"
+            (click)="closeModal()"
+            aria-label="Close course form"
+          >
+            ✕
+          </button>
+        </div>
+
+        @if (formError()) {
+          <div style="background:#fff0ed;color:#c24141;border:1px solid #ffd4cd;padding:10px 12px;border-radius:10px;margin-bottom:14px;font-size:13px;font-weight:600;">
+            ⚠ {{ formError() }}
+          </div>
+        }
+
+        <form (ngSubmit)="saveCourse()" #f="ngForm" style="display:flex;flex-direction:column;gap:14px;">
+          <div>
+            <label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;color:#443b55;">
+              Course Name *
+            </label>
+            <input
+              type="text"
+              name="courseName"
+              autofocus
+              [(ngModel)]="courseForm.courseName"
+              required
+              placeholder="e.g. Full-Stack .NET & Angular"
+              style="width:100%;box-sizing:border-box;height:40px;border:1px solid #dcd7e8;border-radius:10px;padding:0 12px;"
+            />
+          </div>
+
+          <div>
+            <label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;color:#443b55;">
+              Duration *
+            </label>
+            <input
+              type="text"
+              name="duration"
+              [(ngModel)]="courseForm.duration"
+              required
+              placeholder="e.g. 6 Months"
+              style="width:100%;box-sizing:border-box;height:40px;border:1px solid #dcd7e8;border-radius:10px;padding:0 12px;"
+            />
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div>
+              <label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;color:#443b55;">
+                Fees (₹) *
+              </label>
+              <input
+                type="number"
+                name="fees"
+                [(ngModel)]="courseForm.fees"
+                required
+                min="0"
+                style="width:100%;box-sizing:border-box;height:40px;border:1px solid #dcd7e8;border-radius:10px;padding:0 12px;"
+              />
+            </div>
+
+            <div>
+              <label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;color:#443b55;">
+                Seat Capacity *
+              </label>
+              <input
+                type="number"
+                name="capacity"
+                [(ngModel)]="courseForm.capacity"
+                required
+                min="1"
+                style="width:100%;box-sizing:border-box;height:40px;border:1px solid #dcd7e8;border-radius:10px;padding:0 12px;"
+              />
+            </div>
+          </div>
+
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#443b55;cursor:pointer;">
+            <input type="checkbox" name="isActive" [(ngModel)]="courseForm.isActive" />
+            Course is Active (visible for enrollment)
+          </label>
+
+          <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:8px;">
+            <button
+              type="button"
+              (click)="closeModal()"
+              style="border:1px solid #dcd7e8;background:#fff;color:#5b536b;padding:10px 18px;border-radius:10px;font-weight:700;cursor:pointer;"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              [disabled]="f.invalid || isSaving()"
+              style="border:none;background:linear-gradient(135deg,#7545ed,#a33df0);color:#fff;padding:10px 20px;border-radius:10px;font-weight:700;cursor:pointer;"
+            >
+              {{ isSaving() ? 'Saving...' : editingCourseId() ? 'Update Course' : 'Create Course' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
 </div>

@@ -1,0 +1,76 @@
+<div class="courses-page">
+  <div class="page-heading">
+    <div>
+      <span class="eyebrow">COURSE CATALOG</span>
+      <h1>Available Courses</h1>
+      <p>Browse active courses and enroll to reserve your seat.</p>
+    </div>
+    <span class="count-pill">{{ filteredCourses().length }} Courses Available</span>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="alert error-alert"><span>⚠</span> {{ errorMessage() }}</div>
+  }
+
+  @if (successMessage()) {
+    <div class="alert success-alert"><span>✓</span> {{ successMessage() }}</div>
+  }
+
+  <div class="filter-bar">
+    <input
+      type="text"
+      class="filter-input"
+      placeholder="Search by course name or duration..."
+      [ngModel]="searchTerm()"
+      (ngModelChange)="searchTerm.set($event)"
+    />
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="loader"></div>
+      <p>Loading course catalog...</p>
+    </div>
+  } @else if (filteredCourses().length === 0) {
+    <div class="empty-state">
+      <h3>No available courses found</h3>
+      <p>Try clearing your search filter or check back later.</p>
+    </div>
+  } @else {
+    <div class="courses-grid">
+      @for (course of filteredCourses(); track course.courseId) {
+        <article class="course-card">
+          <div class="card-top">
+            <span class="code-badge">#{{ course.courseId }}</span>
+            <span class="credit-badge">{{ course.duration }}</span>
+          </div>
+
+          <h3>{{ course.courseName }}</h3>
+          <p class="dept-text">Fees: ₹{{ course.fees | number: '1.0-2' }}</p>
+
+          <div class="meta-row">
+            <span>Enrolled: <strong>{{ course.enrolledCount }} / {{ course.capacity }}</strong></span>
+            <span>Available: <strong>{{ course.availableSeats }} seats</strong></span>
+          </div>
+
+          <div class="card-actions">
+            @if (isEnrolled(course.courseId)) {
+              <button type="button" class="btn-enrolled" disabled>✓ Enrolled</button>
+            } @else if (isFull(course)) {
+              <button type="button" class="btn-full" disabled>Seats Full</button>
+            } @else {
+              <button
+                type="button"
+                class="btn-enroll"
+                [disabled]="enrollingCourseId() === course.courseId"
+                (click)="enroll(course)"
+              >
+                {{ enrollingCourseId() === course.courseId ? 'Enrolling...' : '+ Enroll Now' }}
+              </button>
+            }
+          </div>
+        </article>
+      }
+    </div>
+  }
+</div>
