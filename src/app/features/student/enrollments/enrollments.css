@@ -168,6 +168,122 @@
   font-weight: 700;
 }
 
+.summary-badges {
+  display: flex;
+  gap: 10px;
+}
+
+.badge-pill,
+.pill {
+  padding: 8px 14px;
+  border-radius: 20px;
+  background: #f0eaff;
+  color: #8050d8;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.enroll-table {
+  width: 100%;
+  min-width: 700px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.enroll-table th {
+  background: #faf9fd;
+  padding: 14px 18px;
+  border-bottom: 1px solid #efedf4;
+  color: #898397;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.enroll-table td {
+  padding: 16px 18px;
+  border-bottom: 1px solid #f4f2f8;
+  color: #302942;
+  font-size: 14px;
+}
+
+.status-pill,
+.status-badge {
+  display: inline-block;
+  padding: 5px 11px;
+  border-radius: 20px;
+  background: #e9f8ef;
+  color: #16834a;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.btn-drop,
+.drop-btn {
+  border: 1px solid #ffd4cd;
+  background: #fff0ed;
+  color: #c24141;
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-browse,
+.browse-btn {
+  display: inline-block;
+  margin-top: 14px;
+  background: linear-gradient(135deg, #7545ed, #a33df0);
+  color: #fff;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.muted-text {
+  color: #aaa3b4;
+}
+
+.cancel-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(24, 18, 43, 0.45);
+}
+
+.cancel-modal {
+  width: 100%;
+  max-width: 460px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  border-radius: 18px;
+  background: #fff;
+  padding: 24px;
+  box-shadow: 0 20px 45px rgba(24, 18, 43, 0.2);
+}
+
+.cancel-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.cancel-modal-header h2 {
+  margin: 0;
+  color: #29213f;
+  font-size: 19px;
+  font-weight: 800;
+}
+
 .loader {
   width: 30px;
   height: 30px;

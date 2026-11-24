@@ -44,4 +44,11 @@ export class StudentPortalService {
   dropEnrollment(enrollmentId: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/enrollments/${enrollmentId}`);
   }
+
+  requestCancellation(enrollmentId: number, reason: string): Observable<any> {
+    return this.http.post(
+      `${this.apiUrl}/enrollments/${enrollmentId}/cancellation-request`,
+      { reason },
+    );
+  }
 }

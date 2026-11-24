@@ -74,4 +74,22 @@ describe('CourseListComponent', () => {
     expect(component.isModalOpen()).toBe(false);
     expect(component.successMessage()).toBe('Course created successfully.');
   });
+
+  it('should keep the form open and reset it for another course', () => {
+    component.openAddModal();
+    component.courseForm = {
+      courseName: 'First Course',
+      duration: '3 Months',
+      fees: 5000,
+      capacity: 30,
+      isActive: true,
+    };
+
+    component.saveCourse(true);
+
+    expect(component.isModalOpen()).toBe(true);
+    expect(component.courseForm.courseName).toBe('');
+    expect(component.courseForm.duration).toBe('3 Months');
+    expect(component.successMessage()).toContain('Add another course');
+  });
 });

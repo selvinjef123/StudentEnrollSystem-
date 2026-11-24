@@ -3,7 +3,7 @@
     <div>
       <span class="eyebrow">ACADEMIC RECORD</span>
       <h1>My Enrollments</h1>
-      <p>Track your active course registrations and manage your schedule.</p>
+      <p>Track your active course registrations and submit cancellation requests.</p>
     </div>
 
     <div class="summary-badges">
@@ -49,17 +49,16 @@
               <td><strong>{{ item.courseName }}</strong></td>
               <td>{{ item.enrolledAt | date: 'dd MMM yyyy' }}</td>
               <td>
-                <span class="status-pill">{{ item.status }}</span>
+                <span class="status-pill">{{ formatStatus(item.status) }}</span>
               </td>
               <td>
-                @if (item.status === 'Enrolled' || item.status === 'Active') {
+                @if (canRequestCancellation(item.status)) {
                   <button
                     type="button"
                     class="btn-drop"
-                    [disabled]="droppingId() === item.enrollmentId"
-                    (click)="dropCourse(item)"
+                    (click)="openCancelModal(item)"
                   >
-                    {{ droppingId() === item.enrollmentId ? 'Dropping...' : 'Drop Course' }}
+                    Request Cancellation
                   </button>
                 } @else {
                   <span class="muted-text">—</span>
@@ -69,6 +68,67 @@
           }
         </tbody>
       </table>
+    </div>
+  }
+
+  <!-- Request Cancellation Modal -->
+  @if (cancelTarget(); as target) {
+    <div
+      class="cancel-modal-backdrop"
+    >
+      <div class="cancel-modal" role="dialog" aria-modal="true">
+        <div class="cancel-modal-header">
+          <h2>
+            Request Course Cancellation
+          </h2>
+          <button
+            type="button"
+            (click)="closeCancelModal()"
+            style="border:none;background:transparent;font-size:18px;cursor:pointer;color:#898397;"
+          >
+            ✕
+          </button>
+        </div>
+
+        <p style="font-size:13.5px;color:#5b536b;margin-bottom:12px;">
+          Course: <strong>{{ target.courseName }}</strong> (Enrollment #{{ target.enrollmentId }})
+        </p>
+
+        @if (cancelError()) {
+          <div class="alert error-alert"><span>⚠</span> {{ cancelError() }}</div>
+        }
+
+        <div style="margin-bottom:16px;">
+          <label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;color:#443b55;">
+            Reason for Cancellation *
+          </label>
+          <textarea
+            rows="3"
+            maxlength="1000"
+            [(ngModel)]="cancelReason"
+            placeholder="e.g. Schedule conflict with my morning classes"
+            style="width:100%;box-sizing:border-box;border:1px solid #dcd7e8;border-radius:10px;padding:10px 12px;font-family:inherit;"
+          ></textarea>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:10px;">
+          <button
+            type="button"
+            (click)="closeCancelModal()"
+            style="border:1px solid #dcd7e8;background:#fff;color:#5b536b;padding:10px 18px;border-radius:10px;font-weight:700;cursor:pointer;"
+          >
+            Close
+          </button>
+          <button
+            type="button"
+            [disabled]="isSubmittingCancel()"
+            (click)="submitCancellation()"
+            style="border:none;background:#dc2626;color:#fff;padding:10px 18px;border-radius:10px;font-weight:700;cursor:pointer;"
+          >
+            {{ isSubmittingCancel() ? 'Submitting...' : 'Submit Request' }}
+          </button>
+        </div>
+      </div>
     </div>
   }
 </div>

@@ -17,7 +17,7 @@ export interface StudentEnrollmentItem {
   courseName: string;
   duration?: string;
   fees?: number;
-  status: string;
+  status: string | number;
   enrolledAt: string;
 }
 

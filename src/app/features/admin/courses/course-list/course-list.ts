@@ -86,7 +86,7 @@ export class CourseListComponent implements OnInit {
     this.formError.set('');
   }
 
-  saveCourse(): void {
+  saveCourse(addAnother = false): void {
     const courseName = this.courseForm.courseName?.trim();
     const duration = this.courseForm.duration?.trim();
 
@@ -117,16 +117,25 @@ export class CourseListComponent implements OnInit {
     request$.subscribe({
       next: (savedCourse) => {
         this.isSaving.set(false);
-        this.closeModal();
-        this.successMessage.set(
-          editId ? 'Course updated successfully.' : 'Course created successfully.',
-        );
         if (!editId) {
           this.courses.update((courses) =>
             [savedCourse, ...courses.filter((course) => course.courseId !== savedCourse.courseId)]
               .slice(0, this.pageSize()),
           );
           this.totalRecords.update((total) => total + 1);
+        }
+
+        if (editId || !addAnother) {
+          this.closeModal();
+          this.successMessage.set(
+            editId ? 'Course updated successfully.' : 'Course created successfully.',
+          );
+        } else {
+          this.courseForm = this.createEmptyForm();
+          this.formError.set('');
+          this.successMessage.set(
+            'Course created successfully. Add another course below.',
+          );
         }
         this.loadCourses();
       },

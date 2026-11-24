@@ -46,6 +46,13 @@ export const routes: Routes = [
         redirectTo: 'dashboard',
         pathMatch: 'full',
       },
+      {
+  path: 'cancellation-requests',
+  loadComponent: () =>
+    import(
+      './features/admin/cancellation-requests/cancellation-request-list/cancellation-request-list'
+    ).then((m) => m.CancellationRequestListComponent),
+},
     ],
   },
   {

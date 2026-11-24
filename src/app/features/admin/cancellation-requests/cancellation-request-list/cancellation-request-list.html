@@ -1,0 +1,274 @@
+<div class="cancellation-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <span class="eyebrow">ENROLLMENT GOVERNANCE</span>
+      <h1>Cancellation Requests</h1>
+      <p>Review student course drop requests and approve or reject with remarks.</p>
+    </div>
+  </div>
+
+  @if (successMessage()) {
+    <div class="alert success-alert"><span>✓</span> {{ successMessage() }}</div>
+  }
+
+  <!-- Summary Cards -->
+  <div class="summary-grid">
+    <div class="summary-card purple">
+      <div class="summary-icon">📋</div>
+      <div>
+        <span>Total Requests</span>
+        <h2>{{ totalRecords() }}</h2>
+      </div>
+    </div>
+
+    <div class="summary-card orange">
+      <div class="summary-icon">⏳</div>
+      <div>
+        <span>Pending (Page)</span>
+        <h2>{{ pendingOnPage() }}</h2>
+      </div>
+    </div>
+
+    <div class="summary-card green">
+      <div class="summary-icon">✓</div>
+      <div>
+        <span>Approved (Page)</span>
+        <h2>{{ approvedOnPage() }}</h2>
+      </div>
+    </div>
+
+    <div class="summary-card red">
+      <div class="summary-icon">✕</div>
+      <div>
+        <span>Rejected (Page)</span>
+        <h2>{{ rejectedOnPage() }}</h2>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table Card -->
+  <div class="table-card">
+    <div class="table-header">
+      <div>
+        <h2>All Cancellation Requests</h2>
+        <p>Filter by student, course, or review status.</p>
+      </div>
+
+      <div class="filter-controls">
+        <input
+          type="text"
+          class="filter-input"
+          placeholder="Search student or course..."
+          [ngModel]="searchTerm()"
+          (ngModelChange)="searchTerm.set($event)"
+          (keyup.enter)="applyFilters()"
+        />
+
+        <select
+          class="filter-select"
+          [ngModel]="selectedStatus()"
+          (ngModelChange)="selectedStatus.set($event); applyFilters()"
+        >
+          <option value="">All Statuses</option>
+          <option value="0">Pending</option>
+          <option value="1">Approved</option>
+          <option value="2">Rejected</option>
+        </select>
+
+        <button type="button" class="btn-filter" (click)="applyFilters()">Filter</button>
+        @if (searchTerm() || selectedStatus()) {
+          <button type="button" class="btn-reset" (click)="resetFilters()">Reset</button>
+        }
+      </div>
+    </div>
+
+    @if (isLoading()) {
+      <div class="state-message">
+        <div class="loader"></div>
+        <p>Loading cancellation requests...</p>
+      </div>
+    } @else if (errorMessage()) {
+      <div class="state-message error-state">
+        <span>⚠️</span>
+        <p>{{ errorMessage() }}</p>
+        <button type="button" class="btn-retry" (click)="loadRequests()">Try Again</button>
+      </div>
+    } @else if (requests().length === 0) {
+      <div class="state-message empty-state">
+        <span>📭</span>
+        <h3>No cancellation requests found</h3>
+        <p>There are currently no requests matching your criteria.</p>
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>STUDENT</th>
+              <th>COURSE</th>
+              <th>REASON</th>
+              <th>REQUESTED ON</th>
+              <th>STATUS</th>
+              <th>ADMIN REMARKS</th>
+              <th>ACTIONS</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (item of requests(); track item.cancellationRequestId) {
+              <tr>
+                <td>
+                  <div class="student-info">
+                    <div class="avatar">{{ item.studentName.charAt(0).toUpperCase() }}</div>
+                    <div>
+                      <strong>{{ item.studentName }}</strong>
+                      <small>{{ item.studentEmail }}</small>
+                    </div>
+                  </div>
+                </td>
+
+                <td>
+                  <strong>{{ item.courseName }}</strong>
+                  <small class="sub-id">Enrollment #{{ item.enrollmentId }}</small>
+                </td>
+
+                <td class="reason-cell" [title]="item.reason">{{ item.reason }}</td>
+
+                <td>{{ item.requestedAt | date: 'dd MMM yyyy, hh:mm a' }}</td>
+
+                <td>
+                  @switch (normalizeStatus(item.status)) {
+                    @case ('Pending') {
+                      <span class="status-badge pending">Pending</span>
+                    }
+                    @case ('Approved') {
+                      <span class="status-badge approved">Approved</span>
+                    }
+                    @case ('Rejected') {
+                      <span class="status-badge rejected">Rejected</span>
+                    }
+                  }
+                </td>
+
+                <td class="remarks-cell">
+                  {{ item.adminRemarks || '—' }}
+                </td>
+
+                <td>
+                  @if (isPending(item.status)) {
+                    <div class="action-buttons">
+                      <button
+                        type="button"
+                        class="btn-approve"
+                        (click)="openReviewModal(item, 'approve')"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        type="button"
+                        class="btn-reject"
+                        (click)="openReviewModal(item, 'reject')"
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  } @else {
+                    <small class="reviewed-date">
+                      Reviewed {{ item.reviewedAt | date: 'dd MMM yyyy' }}
+                    </small>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    @if (!isLoading() && !errorMessage() && totalRecords() > 0) {
+      <div class="pagination">
+        <span class="pagination-info">
+          Page {{ pageNumber() }} of {{ totalPages() }}
+          <span class="total-info">({{ totalRecords() }} requests)</span>
+        </span>
+
+        <div class="pagination-actions">
+          <button
+            type="button"
+            class="page-btn"
+            (click)="previousPage()"
+            [disabled]="pageNumber() === 1"
+          >
+            ← Previous
+          </button>
+          <span class="current-page">{{ pageNumber() }}</span>
+          <button
+            type="button"
+            class="page-btn"
+            (click)="nextPage()"
+            [disabled]="pageNumber() >= totalPages()"
+          >
+            Next →
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Review Modal -->
+  @if (reviewTarget(); as target) {
+    <div class="modal-backdrop">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>
+            {{
+              reviewAction() === 'approve'
+                ? 'Approve Cancellation Request'
+                : 'Reject Cancellation Request'
+            }}
+          </h2>
+          <button type="button" class="close-btn" (click)="closeReviewModal()">✕</button>
+        </div>
+
+        <div class="review-summary">
+          <p><strong>Student:</strong> {{ target.studentName }} ({{ target.studentEmail }})</p>
+          <p><strong>Course:</strong> {{ target.courseName }}</p>
+          <p><strong>Student Reason:</strong> {{ target.reason }}</p>
+        </div>
+
+        @if (reviewError()) {
+          <div class="alert error-alert"><span>⚠</span> {{ reviewError() }}</div>
+        }
+
+        <div class="form-group">
+          <label>Admin Remarks (Optional, max 1000 chars)</label>
+          <textarea
+            rows="3"
+            maxlength="1000"
+            [(ngModel)]="adminRemarks"
+            placeholder="Add a note for the student record..."
+          ></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" (click)="closeReviewModal()">Cancel</button>
+          <button
+            type="button"
+            [class]="reviewAction() === 'approve' ? 'btn-confirm-approve' : 'btn-confirm-reject'"
+            [disabled]="isSubmittingReview()"
+            (click)="submitReview()"
+          >
+            {{
+              isSubmittingReview()
+                ? 'Submitting...'
+                : reviewAction() === 'approve'
+                  ? 'Confirm Approval'
+                  : 'Confirm Rejection'
+            }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
